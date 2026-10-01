@@ -21,10 +21,8 @@ export interface Workout {
   date: number
   exercise: ExerciseType
   plannedSets: number
-  plannedReps: number
-  completedSets: number
-  completedReps: number
-  rpe?: number
+  plannedRepsPerSet: number[]
+  completedRepsPerSet: number[]
 }
 
 export interface DailyRecommendation {
@@ -32,7 +30,7 @@ export interface DailyRecommendation {
   exercises: {
     exercise: ExerciseType
     sets: number
-    reps: number
+    repsPerSet: number[]
     rpe: string
   }[]
 }

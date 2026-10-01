@@ -77,6 +77,18 @@ export async function getAllMaxTests(): Promise<MaxTest[]> {
   })
 }
 
+export async function deleteMaxTest(testId: string): Promise<void> {
+  const database = getDB()
+  const tx = database.transaction('maxTests', 'readwrite')
+  const store = tx.objectStore('maxTests')
+
+  return new Promise((resolve, reject) => {
+    const request = store.delete(testId)
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => resolve()
+  })
+}
+
 export async function saveWorkout(workout: Workout): Promise<void> {
   const database = getDB()
   const tx = database.transaction('workouts', 'readwrite')
@@ -116,5 +128,17 @@ export async function getRecentWorkouts(days: number = 30): Promise<Workout[]> {
       const all = request.result
       resolve(all.filter((w) => w.date >= cutoffDate).sort((a, b) => b.date - a.date))
     }
+  })
+}
+
+export async function deleteWorkout(workoutId: string): Promise<void> {
+  const database = getDB()
+  const tx = database.transaction('workouts', 'readwrite')
+  const store = tx.objectStore('workouts')
+
+  return new Promise((resolve, reject) => {
+    const request = store.delete(workoutId)
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => resolve()
   })
 }

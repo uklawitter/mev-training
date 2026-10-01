@@ -34,11 +34,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     try {
       setLoading(true)
       await addMaxTest(p, r, a)
-      onComplete()
+      await new Promise(resolve => setTimeout(resolve, 500))
+      window.location.reload()
     } catch (err) {
       setError('Failed to save max test. Please try again.')
       console.error(err)
-    } finally {
       setLoading(false)
     }
   }

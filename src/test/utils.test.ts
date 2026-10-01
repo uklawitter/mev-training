@@ -54,14 +54,26 @@ describe('Hard Set Training Algorithm', () => {
       expect(advancedPlan.hardSetsPerWeek).toBe(9)
     })
 
-    it('should scale reps to ~90% of max (RPE 8-9)', () => {
-      const beginnerPlan = getExercisePlan(8)
-      const intermediatePlan = getExercisePlan(20)
-      const advancedPlan = getExercisePlan(50)
+    it('should scale reps with fatigue decay across sets', () => {
+      const beginnerPlan = getExercisePlan(8, 3)
+      const intermediatePlan = getExercisePlan(20, 3)
+      const advancedPlan = getExercisePlan(50, 3)
 
-      expect(beginnerPlan.reps).toBe(7)
-      expect(intermediatePlan.reps).toBe(18)
-      expect(advancedPlan.reps).toBe(45)
+      expect(beginnerPlan.repsPerSet).toHaveLength(3)
+      expect(intermediatePlan.repsPerSet).toHaveLength(3)
+      expect(advancedPlan.repsPerSet).toHaveLength(3)
+
+      expect(beginnerPlan.repsPerSet[0]).toBeGreaterThan(beginnerPlan.repsPerSet[1])
+      expect(beginnerPlan.repsPerSet[1]).toBeGreaterThan(beginnerPlan.repsPerSet[2])
+    })
+
+    it('should generate reps for any number of sets', () => {
+      const plan3 = getExercisePlan(20, 3)
+      const plan5 = getExercisePlan(20, 5)
+
+      expect(plan3.repsPerSet).toHaveLength(3)
+      expect(plan5.repsPerSet).toHaveLength(5)
+      expect(plan5.repsPerSet[0]).toBeGreaterThan(plan5.repsPerSet[4])
     })
 
     it('should progressively increase reps with ability', () => {
@@ -70,9 +82,17 @@ describe('Hard Set Training Algorithm', () => {
       const plan20 = getExercisePlan(20)
       const plan40 = getExercisePlan(40)
 
-      expect(plan5.reps).toBeLessThan(plan10.reps)
-      expect(plan10.reps).toBeLessThan(plan20.reps)
-      expect(plan20.reps).toBeLessThan(plan40.reps)
+      const avg = (reps: number[]) => reps.reduce((a, b) => a + b, 0) / reps.length
+
+      expect(avg(plan5.repsPerSet)).toBeLessThan(avg(plan10.repsPerSet))
+      expect(avg(plan10.repsPerSet)).toBeLessThan(avg(plan20.repsPerSet))
+      expect(avg(plan20.repsPerSet)).toBeLessThan(avg(plan40.repsPerSet))
+    })
+
+    it('should have declining reps across sets', () => {
+      const plan = getExercisePlan(20)
+      expect(plan.repsPerSet[0]).toBeGreaterThan(plan.repsPerSet[1])
+      expect(plan.repsPerSet[1]).toBeGreaterThan(plan.repsPerSet[2])
     })
   })
 
