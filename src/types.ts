@@ -37,11 +37,9 @@ export interface DailyRecommendation {
   }[]
 }
 
-export type FitnessLevel = 'beginner' | 'intermediate' | 'advanced'
-
-export interface VolumeConfig {
-  weeklyTarget: number
-  setsPerSession: { min: number; max: number }
-  repsPerSet: { min: number; max: number }
+export interface HardSetConfig {
+  targetHardSetsPerWeek: { min: number; max: number }
+  setsPerSession: number
   sessionsPerWeek: number
+  rpeTarget: number
 }

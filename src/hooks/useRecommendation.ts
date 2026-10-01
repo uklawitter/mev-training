@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { MaxTest, ExerciseType, DailyRecommendation } from '../types'
 import {
-  getFitnessLevel,
   getExercisePlan,
   getDayExercises,
 } from '../utils/volumeScaling'
@@ -15,14 +14,13 @@ export function useRecommendation(maxTest: MaxTest | null, date: Date = new Date
 
     const exercises = exerciseList.map((exerciseId) => {
       const maxReps = maxTest.results[exerciseId]
-      const fitnessLevel = getFitnessLevel(maxReps)
-      const plan = getExercisePlan(fitnessLevel)
+      const plan = getExercisePlan(maxReps)
 
       return {
         exercise: exerciseId as ExerciseType,
         sets: plan.sets,
         reps: plan.reps,
-        rpe: 'RPE 6-7',
+        rpe: 'RPE 8-9',
       }
     })
 

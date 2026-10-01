@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  getFitnessLevel,
-  getVolumeConfig,
-  calculateRecommendedReps,
+  calculateRepsAtRPE,
   getExercisePlan,
   getDayExercises,
   getDaysSinceLastMaxTest,
@@ -10,97 +8,71 @@ import {
 } from '../utils/volumeScaling'
 import { MaxTest } from '../types'
 
-describe('Volume Scaling Utilities', () => {
-  describe('getFitnessLevel', () => {
-    it('should classify <10 reps as beginner', () => {
-      expect(getFitnessLevel(5)).toBe('beginner')
-      expect(getFitnessLevel(9)).toBe('beginner')
+describe('Hard Set Training Algorithm', () => {
+  describe('calculateRepsAtRPE', () => {
+    it('should calculate reps at RPE 8-9 from max', () => {
+      expect(calculateRepsAtRPE(20, 8.5)).toBeLessThan(20)
+      expect(calculateRepsAtRPE(20, 8.5)).toBeGreaterThan(10)
     })
 
-    it('should classify 10-30 reps as intermediate', () => {
-      expect(getFitnessLevel(10)).toBe('intermediate')
-      expect(getFitnessLevel(20)).toBe('intermediate')
-      expect(getFitnessLevel(29)).toBe('intermediate')
+    it('should return approximately 90% of max at RPE 8-9', () => {
+      const max = 20
+      const repsAt89 = calculateRepsAtRPE(max, 8.5)
+      const percentage = (repsAt89 / max) * 100
+      expect(percentage).toBeGreaterThanOrEqual(85)
+      expect(percentage).toBeLessThanOrEqual(95)
     })
 
-    it('should classify 30+ reps as advanced', () => {
-      expect(getFitnessLevel(30)).toBe('advanced')
-      expect(getFitnessLevel(50)).toBe('advanced')
-      expect(getFitnessLevel(100)).toBe('advanced')
-    })
-  })
+    it('should scale for different max reps', () => {
+      const beginner = calculateRepsAtRPE(8, 8.5)
+      const intermediate = calculateRepsAtRPE(20, 8.5)
+      const advanced = calculateRepsAtRPE(50, 8.5)
 
-  describe('getVolumeConfig', () => {
-    it('should return beginner config', () => {
-      const config = getVolumeConfig('beginner')
-      expect(config.weeklyTarget).toBe(35)
-      expect(config.setsPerSession.min).toBe(3)
-      expect(config.sessionsPerWeek).toBe(2)
-    })
-
-    it('should return intermediate config', () => {
-      const config = getVolumeConfig('intermediate')
-      expect(config.weeklyTarget).toBe(50)
-      expect(config.setsPerSession.min).toBe(2)
-      expect(config.sessionsPerWeek).toBe(3)
-    })
-
-    it('should return advanced config', () => {
-      const config = getVolumeConfig('advanced')
-      expect(config.weeklyTarget).toBe(80)
-      expect(config.setsPerSession.min).toBe(3)
-      expect(config.sessionsPerWeek).toBe(3)
-    })
-  })
-
-  describe('calculateRecommendedReps', () => {
-    it('should calculate reps for beginner', () => {
-      const reps = calculateRecommendedReps('beginner')
-      expect(reps).toBe(35)
-    })
-
-    it('should calculate reps for intermediate', () => {
-      const reps = calculateRecommendedReps('intermediate')
-      expect(reps).toBe(50)
-    })
-
-    it('should calculate reps for advanced', () => {
-      const reps = calculateRecommendedReps('advanced')
-      expect(reps).toBe(80)
+      expect(beginner).toBeLessThan(intermediate)
+      expect(intermediate).toBeLessThan(advanced)
     })
   })
 
   describe('getExercisePlan', () => {
-    it('should return sets and reps for beginner', () => {
-      const plan = getExercisePlan('beginner')
-      expect(plan.sets).toBeGreaterThan(0)
-      expect(plan.reps).toBeGreaterThan(0)
-      expect(plan.sets).toBeLessThanOrEqual(4)
+    it('should return 3 sets for all ability levels', () => {
+      const beginnerPlan = getExercisePlan(8)
+      const intermediatePlan = getExercisePlan(20)
+      const advancedPlan = getExercisePlan(50)
+
+      expect(beginnerPlan.sets).toBe(3)
+      expect(intermediatePlan.sets).toBe(3)
+      expect(advancedPlan.sets).toBe(3)
     })
 
-    it('should return sets and reps for intermediate', () => {
-      const plan = getExercisePlan('intermediate')
-      expect(plan.sets).toBeGreaterThan(0)
-      expect(plan.reps).toBeGreaterThan(0)
-      expect(plan.sets).toBeLessThanOrEqual(4)
+    it('should return 9 hard sets per week', () => {
+      const beginnerPlan = getExercisePlan(8)
+      const intermediatePlan = getExercisePlan(20)
+      const advancedPlan = getExercisePlan(50)
+
+      expect(beginnerPlan.hardSetsPerWeek).toBe(9)
+      expect(intermediatePlan.hardSetsPerWeek).toBe(9)
+      expect(advancedPlan.hardSetsPerWeek).toBe(9)
     })
 
-    it('should return sets and reps for advanced', () => {
-      const plan = getExercisePlan('advanced')
-      expect(plan.sets).toBeGreaterThan(0)
-      expect(plan.reps).toBeGreaterThan(0)
-      expect(plan.sets).toBeLessThanOrEqual(4)
+    it('should scale reps to ~90% of max (RPE 8-9)', () => {
+      const beginnerPlan = getExercisePlan(8)
+      const intermediatePlan = getExercisePlan(20)
+      const advancedPlan = getExercisePlan(50)
+
+      expect(beginnerPlan.reps).toBe(7)
+      expect(intermediatePlan.reps).toBe(18)
+      expect(advancedPlan.reps).toBe(45)
     })
 
-    it('should ensure reps meet minimum for fitness level', () => {
-      const beginnerPlan = getExercisePlan('beginner')
-      expect(beginnerPlan.reps).toBeGreaterThanOrEqual(5)
+    it('should progressively increase reps with ability', () => {
+      const plan5 = getExercisePlan(5)
+      const plan10 = getExercisePlan(10)
+      const plan20 = getExercisePlan(20)
+      const plan40 = getExercisePlan(40)
 
-      const intermediatePlan = getExercisePlan('intermediate')
-      expect(intermediatePlan.reps).toBeGreaterThanOrEqual(8)
-
-      const advancedPlan = getExercisePlan('advanced')
-      expect(advancedPlan.reps).toBeGreaterThanOrEqual(10)
+      expect(plan5.reps).toBeLessThan(plan10.reps)
+      expect(plan10.reps).toBeLessThan(plan20.reps)
+      expect(plan20.reps).toBeLessThan(plan40.reps)
     })
   })
 

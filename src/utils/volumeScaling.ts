@@ -1,55 +1,29 @@
-import { ExerciseType, FitnessLevel, VolumeConfig, MaxTest } from '../types'
+import { ExerciseType, HardSetConfig, MaxTest } from '../types'
 
-const VOLUME_CONFIGS: Record<FitnessLevel, VolumeConfig> = {
-  beginner: {
-    weeklyTarget: 35,
-    setsPerSession: { min: 3, max: 4 },
-    repsPerSet: { min: 5, max: 8 },
-    sessionsPerWeek: 2,
-  },
-  intermediate: {
-    weeklyTarget: 50,
-    setsPerSession: { min: 2, max: 3 },
-    repsPerSet: { min: 8, max: 12 },
-    sessionsPerWeek: 3,
-  },
-  advanced: {
-    weeklyTarget: 80,
-    setsPerSession: { min: 3, max: 4 },
-    repsPerSet: { min: 10, max: 15 },
-    sessionsPerWeek: 3,
-  },
+const HARD_SET_CONFIG: HardSetConfig = {
+  targetHardSetsPerWeek: { min: 8, max: 10 },
+  setsPerSession: 3,
+  sessionsPerWeek: 3,
+  rpeTarget: 8.5,
 }
 
-export function getFitnessLevel(maxReps: number): FitnessLevel {
-  if (maxReps < 10) return 'beginner'
-  if (maxReps < 30) return 'intermediate'
-  return 'advanced'
+export function calculateRepsAtRPE(maxReps: number, targetRPE: number): number {
+  if (targetRPE >= 10) return maxReps
+  if (targetRPE <= 6) return Math.max(1, Math.round(maxReps * 0.5))
+  if (targetRPE >= 8.5) return Math.round(maxReps * 0.9)
+  if (targetRPE >= 7.5) return Math.round(maxReps * 0.8)
+  return Math.round(maxReps * 0.7)
 }
 
-export function getVolumeConfig(fitnessLevel: FitnessLevel): VolumeConfig {
-  return VOLUME_CONFIGS[fitnessLevel]
-}
-
-export function calculateRecommendedReps(fitnessLevel: FitnessLevel): number {
-  const config = getVolumeConfig(fitnessLevel)
-  return config.weeklyTarget
-}
-
-export function getExercisePlan(
-  fitnessLevel: FitnessLevel
-): { sets: number; reps: number } {
-  const config = getVolumeConfig(fitnessLevel)
-  const weeklyTarget = config.weeklyTarget
-
-  const repsPerSession = Math.round(weeklyTarget / config.sessionsPerWeek)
-  const avgSets = (config.setsPerSession.min + config.setsPerSession.max) / 2
-  const sets = Math.round(avgSets)
-  const repsPerSet = Math.round(repsPerSession / sets)
+export function getExercisePlan(maxReps: number): { sets: number; reps: number; hardSetsPerWeek: number } {
+  const config = HARD_SET_CONFIG
+  const repsAtRPE89 = Math.round(maxReps * 0.9)
+  const hardSetsPerWeek = config.setsPerSession * config.sessionsPerWeek
 
   return {
-    sets,
-    reps: Math.max(repsPerSet, config.repsPerSet.min),
+    sets: config.setsPerSession,
+    reps: repsAtRPE89,
+    hardSetsPerWeek,
   }
 }
 
