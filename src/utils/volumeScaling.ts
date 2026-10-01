@@ -76,7 +76,8 @@ export function calculateWeeklyVolume(workouts: any[], date: Date): Record<Exerc
   workouts.forEach((w) => {
     const workoutDate = new Date(w.date)
     if (workoutDate >= weekStart && workoutDate < weekEnd) {
-      volume[w.exercise] += w.completedRepsPerSet?.length || 0
+      const exercise = w.exercise as ExerciseType
+      volume[exercise] += w.completedRepsPerSet?.length || 0
     }
   })
 

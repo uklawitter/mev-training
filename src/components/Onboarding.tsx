@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useMaxTests } from '../hooks/useMaxTests'
 
 interface OnboardingProps {
-  onComplete: () => void
+  onComplete?: () => void
 }
 
-export function Onboarding({ onComplete }: OnboardingProps) {
+export function Onboarding({ onComplete: _onComplete }: OnboardingProps) {
   const { addMaxTest } = useMaxTests()
   const [pushups, setPushups] = useState('')
   const [ringRows, setRingRows] = useState('')

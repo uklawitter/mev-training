@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Workout, MaxTest } from '../types'
 import { getRecentWorkouts, deleteWorkout, getAllMaxTests, deleteMaxTest } from '../db/storage'
-import { useMaxTests } from '../hooks/useMaxTests'
 
 interface HistoryProps {
   onWorkoutDeleted?: () => void
 }
 
 export function History({ onWorkoutDeleted }: HistoryProps) {
-  const { all: hookMaxTests } = useMaxTests()
   const [maxTests, setMaxTests] = useState<MaxTest[]>([])
   const [workouts, setWorkouts] = useState<Workout[]>([])
   const [loading, setLoading] = useState(true)

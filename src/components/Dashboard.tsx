@@ -42,12 +42,6 @@ export function Dashboard({ maxTest, onMaxTestUpdate }: DashboardProps) {
   )
   const daysSince = getDaysSinceLastMaxTest(maxTest)
 
-  const exerciseNames: Record<string, string> = {
-    pushups: 'Push-ups',
-    'ring-rows': 'Ring-rows',
-    'air-squats': 'Air Squats',
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
       {showMaxTestModal && (
