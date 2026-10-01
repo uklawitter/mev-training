@@ -2,21 +2,21 @@ import { ExerciseType, FitnessLevel, VolumeConfig, MaxTest } from '../types'
 
 const VOLUME_CONFIGS: Record<FitnessLevel, VolumeConfig> = {
   beginner: {
-    weeklyTarget: 8,
-    setsPerSession: { min: 2, max: 3 },
-    repsPerSet: { min: 2, max: 4 },
+    weeklyTarget: 35,
+    setsPerSession: { min: 3, max: 4 },
+    repsPerSet: { min: 5, max: 8 },
     sessionsPerWeek: 2,
   },
   intermediate: {
-    weeklyTarget: 12,
+    weeklyTarget: 50,
     setsPerSession: { min: 2, max: 3 },
-    repsPerSet: { min: 4, max: 8 },
+    repsPerSet: { min: 8, max: 12 },
     sessionsPerWeek: 3,
   },
   advanced: {
-    weeklyTarget: 20,
+    weeklyTarget: 80,
     setsPerSession: { min: 3, max: 4 },
-    repsPerSet: { min: 5, max: 12 },
+    repsPerSet: { min: 10, max: 15 },
     sessionsPerWeek: 3,
   },
 }
@@ -33,23 +33,19 @@ export function getVolumeConfig(fitnessLevel: FitnessLevel): VolumeConfig {
 
 export function calculateRecommendedReps(fitnessLevel: FitnessLevel): number {
   const config = getVolumeConfig(fitnessLevel)
-  const avgRepsPerSet = (config.repsPerSet.min + config.repsPerSet.max) / 2
-  const setsPerSession = config.setsPerSession.min
-  const sessionsPerWeek = config.sessionsPerWeek
-
-  const weeklyReps = avgRepsPerSet * setsPerSession * sessionsPerWeek
-  return Math.max(Math.round(weeklyReps / 2), config.repsPerSet.min)
+  return config.weeklyTarget
 }
 
 export function getExercisePlan(
   fitnessLevel: FitnessLevel
 ): { sets: number; reps: number } {
   const config = getVolumeConfig(fitnessLevel)
-  const targetReps = calculateRecommendedReps(fitnessLevel)
+  const weeklyTarget = config.weeklyTarget
 
+  const repsPerSession = Math.round(weeklyTarget / config.sessionsPerWeek)
   const avgSets = (config.setsPerSession.min + config.setsPerSession.max) / 2
   const sets = Math.round(avgSets)
-  const repsPerSet = Math.round(targetReps / sets)
+  const repsPerSet = Math.round(repsPerSession / sets)
 
   return {
     sets,

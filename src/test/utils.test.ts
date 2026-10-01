@@ -33,21 +33,21 @@ describe('Volume Scaling Utilities', () => {
   describe('getVolumeConfig', () => {
     it('should return beginner config', () => {
       const config = getVolumeConfig('beginner')
-      expect(config.weeklyTarget).toBe(8)
-      expect(config.setsPerSession.min).toBe(2)
+      expect(config.weeklyTarget).toBe(35)
+      expect(config.setsPerSession.min).toBe(3)
       expect(config.sessionsPerWeek).toBe(2)
     })
 
     it('should return intermediate config', () => {
       const config = getVolumeConfig('intermediate')
-      expect(config.weeklyTarget).toBe(12)
+      expect(config.weeklyTarget).toBe(50)
       expect(config.setsPerSession.min).toBe(2)
       expect(config.sessionsPerWeek).toBe(3)
     })
 
     it('should return advanced config', () => {
       const config = getVolumeConfig('advanced')
-      expect(config.weeklyTarget).toBe(20)
+      expect(config.weeklyTarget).toBe(80)
       expect(config.setsPerSession.min).toBe(3)
       expect(config.sessionsPerWeek).toBe(3)
     })
@@ -56,20 +56,17 @@ describe('Volume Scaling Utilities', () => {
   describe('calculateRecommendedReps', () => {
     it('should calculate reps for beginner', () => {
       const reps = calculateRecommendedReps('beginner')
-      expect(reps).toBeGreaterThan(0)
-      expect(reps).toBeLessThanOrEqual(10)
+      expect(reps).toBe(35)
     })
 
     it('should calculate reps for intermediate', () => {
       const reps = calculateRecommendedReps('intermediate')
-      expect(reps).toBeGreaterThan(0)
-      expect(reps).toBeLessThanOrEqual(20)
+      expect(reps).toBe(50)
     })
 
     it('should calculate reps for advanced', () => {
       const reps = calculateRecommendedReps('advanced')
-      expect(reps).toBeGreaterThan(0)
-      expect(reps).toBeLessThanOrEqual(50)
+      expect(reps).toBe(80)
     })
   })
 
@@ -78,14 +75,14 @@ describe('Volume Scaling Utilities', () => {
       const plan = getExercisePlan('beginner')
       expect(plan.sets).toBeGreaterThan(0)
       expect(plan.reps).toBeGreaterThan(0)
-      expect(plan.sets).toBeLessThanOrEqual(3)
+      expect(plan.sets).toBeLessThanOrEqual(4)
     })
 
     it('should return sets and reps for intermediate', () => {
       const plan = getExercisePlan('intermediate')
       expect(plan.sets).toBeGreaterThan(0)
       expect(plan.reps).toBeGreaterThan(0)
-      expect(plan.sets).toBeLessThanOrEqual(3)
+      expect(plan.sets).toBeLessThanOrEqual(4)
     })
 
     it('should return sets and reps for advanced', () => {
@@ -97,13 +94,13 @@ describe('Volume Scaling Utilities', () => {
 
     it('should ensure reps meet minimum for fitness level', () => {
       const beginnerPlan = getExercisePlan('beginner')
-      expect(beginnerPlan.reps).toBeGreaterThanOrEqual(2)
+      expect(beginnerPlan.reps).toBeGreaterThanOrEqual(5)
 
       const intermediatePlan = getExercisePlan('intermediate')
-      expect(intermediatePlan.reps).toBeGreaterThanOrEqual(4)
+      expect(intermediatePlan.reps).toBeGreaterThanOrEqual(8)
 
       const advancedPlan = getExercisePlan('advanced')
-      expect(advancedPlan.reps).toBeGreaterThanOrEqual(5)
+      expect(advancedPlan.reps).toBeGreaterThanOrEqual(10)
     })
   })
 
